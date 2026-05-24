@@ -16,7 +16,15 @@
       <div class="row-container">
         <ul class="menu-list">
           <th:block th:each="themeItem, status : ${theme.config.theme.bg_themes}">
-            <li class="menu-item" th:data-item="${themeItem}">
+            <li
+              class="menu-item"
+              th:data-bg-name="${themeItem.bg_name}"
+              th:data-bg-url="${themeItem.bg_url}"
+              th:data-bg-img-strategy="${themeItem.bg_img_strategy}"
+              th:data-bg-icon="${themeItem.bg_icon}"
+              th:data-bg-night="${themeItem.bg_night}"
+              th:data-bg-isdefault="${themeItem.bg_isdefault}"
+            >
               <span class="iconify" th:data-icon="${themeItem.bg_icon}"></span>
             </li>
           </th:block>

@@ -366,14 +366,19 @@ export class Events {
 
   /**
    * 注册主题切换事件
+   *
+   * 用 el.onclick = ... 直接覆盖式赋值，避免 Halo 2.22+ 下若干场景
+   * (PJAX 重新执行、documentFunction 多次触发、反代缓存等) 导致
+   * addEventListener 被调用多次，偶数次 click toggle 互相抵消、
+   * 菜单点不开。
    */
   @documentFunction(false)
   public registerThemeChangeEvent() {
     const themeChangeButtonElements = document.querySelectorAll(".theme-change-js");
     themeChangeButtonElements.forEach((element) => {
-      element.addEventListener("click", () => {
+      (element as HTMLElement).onclick = () => {
         document.querySelector(".skin-menu")?.classList.toggle("show");
-      });
+      };
     });
   }
 
@@ -385,17 +390,17 @@ export class Events {
     const themeModelElement = document.querySelector(".skin-menu") as HTMLElement;
     const themeItemElements = themeModelElement?.querySelectorAll(".skin-menu .menu-item");
     themeItemElements?.forEach((element) => {
-      const themeData: ThemeItemOptions = JSON.parse(element.getAttribute("data-item") || "{}");
+      const themeData: ThemeItemOptions = this.parseThemeItem(element);
       if (themeData.bg_isdefault) {
         this.registerThemeRevert(themeData);
       }
-      element.addEventListener("click", () => {
+      (element as HTMLElement).onclick = () => {
         this.registerThemeRevert(themeData);
         localStorage.setItem("sakuraTheme", JSON.stringify(themeData));
         // 隐藏主题开关
         themeModelElement?.classList.remove("show");
         localStorage.setItem("systemMode", "false");
-      });
+      };
     });
 
     WindowEventProxy.addEventListener(
@@ -405,6 +410,26 @@ export class Events {
       },
       200
     );
+  }
+
+  /**
+   * 从菜单项的 data-* 属性解析主题数据。
+   *
+   * Halo 2.22+ 把 settings.yaml 中的 repeater 改为 array 后，模板里
+   * `${themeItem}` 渲染出来的是 Java Map.toString()，不是合法 JSON，
+   * 旧实现 JSON.parse(data-item) 会抛错，导致整个主题切换失效。
+   * 这里改为读取若干独立的 data-bg-* 属性，避免依赖序列化结果。
+   */
+  private parseThemeItem(element: Element): ThemeItemOptions {
+    const dataset = (element as HTMLElement).dataset;
+    return {
+      bg_name: dataset.bgName || "",
+      bg_url: dataset.bgUrl || "",
+      bg_img_strategy: dataset.bgImgStrategy || "none",
+      bg_icon: dataset.bgIcon || "",
+      bg_night: dataset.bgNight === "true",
+      bg_isdefault: dataset.bgIsdefault === "true",
+    };
   }
 
   /**
