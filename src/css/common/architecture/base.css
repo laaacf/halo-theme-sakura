@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/themes/theme-sakura/assets/fonts/inter.woff2") format("woff2");
+}
+
 ::-moz-selection {
   background: #464646;
   color: #fff;
@@ -14,7 +22,8 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
   text-size-adjust: 100%;
   overflow-x: hidden;
   word-break: break-all;
