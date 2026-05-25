@@ -270,10 +270,6 @@
   }
 
   @mixin screens-md {
-    & p {
-      font-size: 0.875em;
-    }
-
     & .begin {
       margin-top: 6px;
     }
